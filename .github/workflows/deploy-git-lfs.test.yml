@@ -1,0 +1,22 @@
+name: Git lfs test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build and Deploy
+    runs-on: AbbVie-net-dev
+    environment: dev
+
+    steps:
+    - name: Install Git lfs
+      run: |
+        [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+        $exePath = "$env:TEMP\git-lfs-windows.exe"
+        (New-Object Net.WebClient).DownloadFile('https://github.com/git-lfs/git-lfs/releases/download/v2.6.1/git-lfs-windows-v2.6.1.exe', $exePath)
+        cmd /c start /wait $exePath /VERYSILENT /SUPPRESSMSGBOXES /NORESTART
+        setx path "$env:ProgramFiles\Git LFS"
+        Add-SessionPath "$env:ProgramFiles\Git LFS"
+        git lfs install --force
+        git lfs version
